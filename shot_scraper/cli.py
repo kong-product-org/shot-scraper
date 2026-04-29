@@ -320,6 +320,9 @@ def shot(
         browser_obj.close()
 
 
+CHROME_PROFILE = os.environ.get("SHOT_SCRAPER_CHROME_PROFILE")
+
+
 def _browser_context(
     p,
     auth,
@@ -350,7 +353,39 @@ def _browser_context(
         context_args["reduced_motion"] = "reduce"
     if user_agent is not None:
         context_args["user_agent"] = user_agent
-    context = browser_obj.new_context(**context_args)
+
+    if browser in ("chromium", "chrome", "chrome-beta"):
+        if CHROME_PROFILE:
+            context = p.chromium.launch_persistent_context(
+                CHROME_PROFILE,
+                headless=not interactive,
+                channel="chrome",
+                devtools=devtools,
+                **context_args,
+            )
+            browser_obj = context
+        else:
+            browser_obj = p.chromium.launch(headless=not interactive, devtools=devtools)
+            context_args["storage_state"] = json.load(auth) if auth else None
+            if context_args["storage_state"] is None:
+                context_args.pop("storage_state")
+            context = browser_obj.new_context(**context_args)
+    elif browser == "firefox":
+        browser_obj = p.firefox.launch(headless=not interactive, devtools=devtools)
+        if auth:
+            context_args["storage_state"] = json.load(auth)
+        context = browser_obj.new_context(**context_args)
+    elif browser == "webkit":
+        browser_obj = p.webkit.launch(headless=not interactive, devtools=devtools)
+        if auth:
+            context_args["storage_state"] = json.load(auth)
+        context = browser_obj.new_context(**context_args)
+    else:
+        browser_obj = p.chromium.launch(headless=not interactive, devtools=devtools)
+        if auth:
+            context_args["storage_state"] = json.load(auth)
+        context = browser_obj.new_context(**context_args)
+
     if timeout:
         context.set_default_timeout(timeout)
     return context, browser_obj
@@ -884,15 +919,15 @@ def auth(url, context_file, browser, user_agent, devtools, log_console):
         shot-scraper auth https://github.com/ auth.json
     """
     with sync_playwright() as p:
-        context, browser_obj = _browser_context(
-            p,
-            auth=None,
-            interactive=True,
-            devtools=devtools,
-            browser=browser,
-            user_agent=user_agent,
-        )
-        context = browser_obj.new_context()
+        if CHROME_PROFILE:
+            context = p.chromium.launch_persistent_context(
+                CHROME_PROFILE,
+                headless=False,
+                channel="chrome",
+            )
+        else:
+            browser_obj = p.chromium.launch(headless=False)
+            context = browser_obj.new_context()
         page = context.new_page()
         if log_console:
             page.on("console", console_log)
