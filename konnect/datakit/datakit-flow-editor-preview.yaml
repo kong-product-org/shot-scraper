@@ -6,4 +6,10 @@
   javascript: |
     async () => {
       await sleep(9000);
+      const btn = [...document.querySelectorAll('.dk-option-label')].find(el => el.textContent.includes('Flow editor')) ||
+        document.querySelector('.button-open-editor');
+      if (btn) {
+        btn.click();
+        await sleep(5000);
+      }
     }

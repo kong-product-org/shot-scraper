@@ -1,5 +1,5 @@
 - output: app/assets/images/dev-portal/dev-portal-navigation.png
-  url: https://cloud.konghq.com/us/portals/96203762-1e75-49ab-a581-eb0ce46fe579/editor/navigation/main
+  url: https://cloud.konghq.com/us/portals/52da1f16-7f2a-4ee0-8cd2-ab118fa795d0/editor/navigation/main
   wait: 1000
   width: 2033
   height: 1384
