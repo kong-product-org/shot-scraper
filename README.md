@@ -12,12 +12,12 @@ make screenshot konnect/platform/overview.yaml      # take screenshots for one f
 make screenshots-all                                # take all screenshots
 ```
 
-The default assumes the fork is cloned as a sibling of `developer.konghq.com`. Override `DOCS_DIR` if yours is elsewhere:
+The default assumes the fork is cloned inside `developer.konghq.com`. Override `DOCS_DIR` if yours is elsewhere:
 
 ```bash
-# Cloned inside developer.konghq.com:
-make screenshot konnect/platform/overview.yaml DOCS_DIR=..
-make screenshots-all DOCS_DIR=..
+# Cloned as a sibling of developer.konghq.com:
+make screenshot konnect/platform/overview.yaml DOCS_DIR=../developer.konghq.com
+make screenshots-all DOCS_DIR=../developer.konghq.com
 
 # Cloned at a custom path:
 make screenshot konnect/platform/overview.yaml DOCS_DIR=/path/to/developer.konghq.com

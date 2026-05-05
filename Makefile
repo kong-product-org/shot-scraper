@@ -1,7 +1,7 @@
 # Path to the developer.konghq.com repo where screenshots are written.
-# Default assumes this repo is cloned as a sibling of developer.konghq.com.
-# Override if your layout differs: make screenshot ... DOCS_DIR=..
-DOCS_DIR ?= ../developer.konghq.com
+# Default assumes this repo is cloned inside developer.konghq.com.
+# If cloned as a sibling: make screenshot ... DOCS_DIR=../developer.konghq.com
+DOCS_DIR ?= ..
 
 # Absolute path to this Makefile's directory, used to reference macros and YAML configs.
 SELF_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -19,6 +19,7 @@ SHOT_SCRAPER_CHROME_PROFILE ?= $(CHROME_PROFILE_DEFAULT)
 
 # Install Python dependencies and the Chromium browser.
 install:
+	which uv > /dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
 	uv sync
 	uv run playwright install chromium
 
@@ -42,24 +43,26 @@ screenshot:
 ifeq ($(FILE),)
 	$(error Usage: make screenshot konnect/platform/overview.yaml)
 endif
-	@cd '$(DOCS_DIR)' && \
+	@DOCS_ABS=$$(cd '$(DOCS_DIR)' && pwd); \
+	  cd "$$DOCS_ABS" && \
 	  SHOT_SCRAPER_CHROME_PROFILE='$(SHOT_SCRAPER_CHROME_PROFILE)' \
 	  uv run --project '$(SELF_DIR)' shot-scraper multi --silent \
 	  --macro '$(SELF_DIR)macros.yaml' \
-	  '$(SELF_DIR)$(FILE)'
-	@grep 'output:' '$(SELF_DIR)$(FILE)' | sed 's/.*output: *//' | while read f; do echo "$(abspath $(DOCS_DIR))/$$f"; done
+	  '$(SELF_DIR)$(FILE)'; \
+	  grep 'output:' '$(SELF_DIR)$(FILE)' | sed 's/.*output: *//' | while read f; do echo "$$DOCS_ABS/$$f"; done
 
 # Take screenshots for every YAML config in konnect/ in alphabetical order.
 screenshots-all:
-	@find '$(SELF_DIR)konnect' -name '*.yaml' | sort | while read f; do \
+	@DOCS_ABS=$$(cd '$(DOCS_DIR)' && pwd); \
+	find '$(SELF_DIR)konnect' -name '*.yaml' | sort | while read f; do \
 	  file=$${f#$(SELF_DIR)}; \
 	  echo "--- $$file ---"; \
-	  cd '$(abspath $(DOCS_DIR))' && \
+	  cd "$$DOCS_ABS" && \
 	    SHOT_SCRAPER_CHROME_PROFILE='$(SHOT_SCRAPER_CHROME_PROFILE)' \
-	    uv run --project '$(SELF_DIR)' shot-scraper multi \
+	    uv run --project '$(SELF_DIR)' shot-scraper multi --silent \
 	    --macro '$(SELF_DIR)macros.yaml' \
 	    "$$f"; \
-	  grep 'output:' "$$f" | sed 's/.*output: *//' | while read o; do echo "$(abspath $(DOCS_DIR))/$$o"; done; \
+	  grep 'output:' "$$f" | sed 's/.*output: *//' | while read o; do echo "$$DOCS_ABS/$$o"; done; \
 	done
 
 .PHONY: install set-env auth screenshot screenshots-all $(FILE)
