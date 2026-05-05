@@ -1,0 +1,18 @@
+[project]
+name = "shot-scraper"
+version = "1.2"
+description = "A command-line utility for taking automated screenshots of websites"
+requires-python = ">=3.10"
+dependencies = [
+    "click",
+    "click-default-group",
+    "playwright==1.31.0",
+    "PyYAML",
+]
+
+[project.scripts]
+shot-scraper = "shot_scraper.cli:cli"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

@@ -334,16 +334,6 @@ def _browser_context(
     timeout=None,
     reduced_motion=False,
 ):
-    browser_kwargs = dict(headless=not interactive, devtools=devtools)
-    if browser == "chromium":
-        browser_obj = p.chromium.launch(**browser_kwargs)
-    elif browser == "firefox":
-        browser_obj = p.firefox.launch(**browser_kwargs)
-    elif browser == "webkit":
-        browser_obj = p.webkit.launch(**browser_kwargs)
-    else:
-        browser_kwargs["channel"] = browser
-        browser_obj = p.chromium.launch(**browser_kwargs)
     context_args = {}
     if auth:
         context_args["storage_state"] = json.load(auth)
@@ -360,30 +350,20 @@ def _browser_context(
                 CHROME_PROFILE,
                 headless=not interactive,
                 channel="chrome",
-                devtools=devtools,
                 **context_args,
             )
             browser_obj = context
         else:
-            browser_obj = p.chromium.launch(headless=not interactive, devtools=devtools)
-            context_args["storage_state"] = json.load(auth) if auth else None
-            if context_args["storage_state"] is None:
-                context_args.pop("storage_state")
+            browser_obj = p.chromium.launch(headless=not interactive)
             context = browser_obj.new_context(**context_args)
     elif browser == "firefox":
-        browser_obj = p.firefox.launch(headless=not interactive, devtools=devtools)
-        if auth:
-            context_args["storage_state"] = json.load(auth)
+        browser_obj = p.firefox.launch(headless=not interactive)
         context = browser_obj.new_context(**context_args)
     elif browser == "webkit":
-        browser_obj = p.webkit.launch(headless=not interactive, devtools=devtools)
-        if auth:
-            context_args["storage_state"] = json.load(auth)
+        browser_obj = p.webkit.launch(headless=not interactive)
         context = browser_obj.new_context(**context_args)
     else:
-        browser_obj = p.chromium.launch(headless=not interactive, devtools=devtools)
-        if auth:
-            context_args["storage_state"] = json.load(auth)
+        browser_obj = p.chromium.launch(headless=not interactive)
         context = browser_obj.new_context(**context_args)
 
     if timeout:
