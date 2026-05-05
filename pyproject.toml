@@ -6,7 +6,8 @@ requires-python = ">=3.10"
 dependencies = [
     "click",
     "click-default-group",
-    "playwright==1.44.0",
+    "playwright",
+    "greenlet>=3.1.0",
     "PyYAML",
 ]
 
