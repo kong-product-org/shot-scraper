@@ -1,8 +1,8 @@
 - output: app/assets/images/konnect/container.png
   url: https://cloud.konghq.com/us/catalog/integrations/gitlab/instances
   wait: 1000
-  width: 2033
-  height: 1384
+  width: 1600
+  height: 800
   javascript: |
     async () => {
       await sleep(9000);
