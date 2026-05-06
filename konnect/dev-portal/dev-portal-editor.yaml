@@ -1,8 +1,8 @@
 - output: app/assets/images/dev-portal/dev-portal-editor.png
   url: https://cloud.konghq.com/us/portals/52da1f16-7f2a-4ee0-8cd2-ab118fa795d0/editor/pages/6c80cc77-c8eb-4ee8-a6da-1442dc5210e3
   wait: 1000
-  width: 2033
-  height: 1384
+  width: 1600
+  height: 1000
   javascript: |
     async () => {
       await sleep(9000);
